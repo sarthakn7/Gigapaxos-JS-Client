@@ -2,7 +2,7 @@
   "name": "GigapaxosJsClient",
   "version": "1.0.0",
   "description": "This is a Javascript client for [Gigapaxos](https://github.com/MobilityFirst/gigapaxos \"Gigapaxos\").",
-  "main": "src/gigapaxos_client.js",
+  "main": "dist/gpClient.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
