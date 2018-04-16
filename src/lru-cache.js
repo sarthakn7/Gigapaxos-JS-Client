@@ -21,15 +21,8 @@ export function LRU(capacity) {
     capacity : capacity,
     items : new Map(),
 
-    validateKey : function (key) {
-      // Last check is for NaN, as only NaN !== NaN
-      if (key === undefined || key === null || key !== key) {
-        throw 'Invalid key';
-      }
-    },
-
     get : function (key) {
-      this.validateKey(key);
+      validateKey(key);
 
       let value = this.items.get(key);
       // Reset the key so that it goes to the end of the map
@@ -40,7 +33,7 @@ export function LRU(capacity) {
     },
 
     set : function (key, value) {
-      this.validateKey(key);
+      validateKey(key);
 
       // Remove the key if it's already present so that logic to evict after
       // maxItems works properly and if same key is reinserted it gets inserted
@@ -56,10 +49,28 @@ export function LRU(capacity) {
     },
 
     delete : function (key) {
-      this.validateKey(key);
+      validateKey(key);
 
       this.items.delete(key);
+    },
+
+    hasKey : function (key) {
+      if (!isKeyValid(key)) {
+        return false;
+      }
+      return this.items.has(key);
     }
 
   };
+}
+
+function validateKey(key) {
+  // Last check is for NaN, as only NaN !== NaN
+  if (!isKeyValid(key)) {
+    throw 'Invalid key';
+  }
+}
+
+function isKeyValid(key) {
+  return !(key === undefined || key === null || key !== key);
 }
