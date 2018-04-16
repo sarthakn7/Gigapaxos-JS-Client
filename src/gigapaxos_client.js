@@ -11,9 +11,10 @@ class ActivesInfo {
 }
 
 const MIN_REQUEST_ACTIVES_INTERVAL = 60000;
+const HTTP_PORT_OFFSET = 300; // TODO: replace with mechanism to obtain this
 
 let broadcastName = '**'; // TODO: comes from config
-let reconfiguratorAddress = 'http://127.0.0.1:9600'; // TODO : fill some valid value here
+let reconfiguratorAddress = 'http://127.0.0.1:9300'; // TODO : fill some valid value here
 // TODO: later: two different initialize, one sets reconfigurator address, one kind of looks up reconfigurator addresses in a dns-like way
 let activesInfo = null;
 
@@ -23,8 +24,8 @@ let pendingAppRequests = [];
 let updateActiveReplicasCallback = function (response) {
   let now = Date.now();
   let actives = [];
-  for (let activeReplica in response['ACTIVE_REPLICAS']) {
-    actives.push('http:/' + activeReplica);
+  for (let activeReplica of response['ACTIVE_REPLICAS']) {
+    actives.push(createActiveReplicaAddress(activeReplica));
   }
   activesInfo = new ActivesInfo(actives, now);
   updatingActiveReplicas = false;
@@ -34,6 +35,19 @@ let updateActiveReplicasCallback = function (response) {
     sendRequestToActive(requestAndCallback.request, requestAndCallback.callback);
   }
 };
+
+/**
+ * Adds the HTTP_PORT_OFFSET to the address, and also prefixes with 'http:/'.
+ *
+ * @param receivedAddress Address received from reconfigurators
+ * @returns {string} HTTP address for active replica
+ */
+function createActiveReplicaAddress(receivedAddress) {
+  let addressAndPort = receivedAddress.split(':');
+  let httpPort = parseInt(addressAndPort[1]) + HTTP_PORT_OFFSET;
+
+  return `http:/${addressAndPort[0]}:${httpPort}`;
+}
 
 function sendRequest(request, address, callback) {
   return fetch(address, {
@@ -156,15 +170,12 @@ function sendRequestToActive(request, callback) {
     queueRequest(request, callback);
   } else {
     if (activesInfo !== null && activesInfo.actives.length > 0 && queriedActivesRecently()) {
-      let nearestActive = getNearest(activesInfo.actives); // TODO: get nearest active from E2ERedirector.getNearest
+      let nearestActive = getNearest(activesInfo.actives);
       sendRequest(request, nearestActive, callback);
+    } else {
+      queueRequest(request, callback);
+      updateActiveReplicas(request.SERVICE_NAME);
     }
-
-    queueRequest(request, callback);
-    updateActiveReplicas(request.SERVICE_NAME);
-
-    let nearestActive = getNearest(activesInfo.actives); // TODO: get nearest active from E2ERedirector.getNearest
-    sendRequest(request, nearestActive, callback);
   }
 }
 
@@ -212,4 +223,3 @@ function checkConnectivityWithTimeout(attemptTimeout, address) {
 }
 
 // Code that needs to run on initialization
-
