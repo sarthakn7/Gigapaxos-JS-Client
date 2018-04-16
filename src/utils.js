@@ -1,4 +1,6 @@
-let createdIds = []; // TODO: make this bounded
+const MAX_IDS = 100;
+
+let createdIds = [];
 
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
@@ -15,10 +17,17 @@ export function createId() {
   // TODO: see if above needs to be addressed. Apart from using HTML5 storage, we can also see if socket can be refreshed on reload
 
   do {
-    id = random(1000000000000, 10000000000000000);
-  } while (!createdIds.includes(id)); // TODO: keep number of checks bounded
+    id = random(10000, 10000000000000000);
+  } while (createdIds.includes(id));
 
-  createdIds.push(id);
+  addId(id);
 
   return id;
+}
+
+function addId(id) {
+  while (createdIds.length >= MAX_IDS) {
+    createdIds.shift();
+  }
+  createdIds.push(id);
 }
