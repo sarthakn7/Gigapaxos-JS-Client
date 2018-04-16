@@ -1,15 +1,17 @@
-export function info(message) {
+export var log = this;
+
+function info(message) {
   console.log(message);
 }
 
-export function warning(message) {
+function warning(message) {
   console.log(message);
 }
 
-export function error(message) {
+function error(message) {
   console.log(message);
 }
 
-export function fine(message) {
+function fine(message) {
   console.log(message);
 }

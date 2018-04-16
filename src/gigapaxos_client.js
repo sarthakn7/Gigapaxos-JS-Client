@@ -1,7 +1,7 @@
-import {REQUEST_TYPES} from 'src/request_types.js';
+import {REQUEST_TYPES} from './request_types.js';
 import {createId} from "./utils.js";
 import {learnSample, getNearest} from "./e2e_latency_aware_redirector";
-import * as log from 'logger';
+import {log} from './logger.js';
 
 class ActivesInfo {
   constructor(actives, lastUpdated) {
