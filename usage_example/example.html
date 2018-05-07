@@ -39,6 +39,8 @@ Last updated: <label id="last_updated">NA</label> <br>
 </table>
 
 <script type="text/javascript">
+  gpClient.initialize('http://127.0.0.1:9300');
+
   function submit() {
     let value = document.getElementById('input').value;
     let time = (new Date()).toLocaleString();

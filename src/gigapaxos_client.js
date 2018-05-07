@@ -14,7 +14,7 @@ const MIN_REQUEST_ACTIVES_INTERVAL = 60000;
 const HTTP_PORT_OFFSET = 300; // TODO: replace with mechanism to obtain this
 
 let broadcastName = '**'; // TODO: comes from config
-let reconfiguratorAddress = 'http://127.0.0.1:9300'; // TODO : fill some valid value here
+let reconfiguratorAddress;
 // TODO: later: two different initialize, one sets reconfigurator address, one kind of looks up reconfigurator addresses in a dns-like way
 let activesInfo = null; // TODO: map from service name to actives
 
@@ -35,6 +35,10 @@ let updateActiveReplicasCallback = function (response) {
     sendRequestToActive(requestAndCallback.request, requestAndCallback.callback);
   }
 };
+
+export function initialize(newReconfiguratorAddress) {
+  reconfiguratorAddress = newReconfiguratorAddress;
+}
 
 /**
  * Adds the HTTP_PORT_OFFSET to the address, and also prefixes with 'http:/'.
@@ -79,6 +83,8 @@ function sendRequest(request, address, callback) {
 // Reconfigurator functions
 
 export function createService(serviceName, initialState, callback) {
+  checkInitialized();
+
   let request = {
     IS_QUERY:true,
     EPOCH:0, // TODO: where is epoch coming from
@@ -97,21 +103,14 @@ export function createService(serviceName, initialState, callback) {
   // TODO : send request to reconfigurator
 }
 
-export function deleteService(serviceName) {
-  let request = {
-    serviceName : serviceName
-  };
-}
-
 function updateActiveReplicas(name) {
   updatingActiveReplicas = true;
   requestActiveReplicas(name, updateActiveReplicasCallback);
 }
 
-export function requestActiveReplicas(name, callback) {
+function requestActiveReplicas(name, callback) {
   let request = {
     IS_QUERY:true,
-    EPOCH:0, // TODO: where is epoch coming from
     RECURSIVE_REDIRECT:true,
     CREATE_TIME:Date.now(),
     TYPE : REQUEST_TYPES.REQUEST_ACTIVE_REPLICAS,
@@ -133,6 +132,8 @@ function changeReconfigurators() {
 // App request
 
 export function sendAppRequest(serviceName, type, content, callback) {
+  checkInitialized();
+
   let request = {
     REQUEST_ID : createId(),
     SERVICE_NAME : serviceName,
@@ -149,6 +150,12 @@ export function sendAppRequest(serviceName, type, content, callback) {
 
   let completeCallback = createCompleteCallback(request, callback);
   sendRequestToActive(request, completeCallback);
+}
+
+function checkInitialized() {
+  if (reconfiguratorAddress === undefined) {
+    throw "Client not initialized";
+  }
 }
 
 function createCompleteCallback(address, callback) {
