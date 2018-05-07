@@ -31,3 +31,24 @@ function addId(id) {
   }
   createdIds.push(id);
 }
+
+/**
+ * This uses Google's public DNS over https (https://developers.google.com/speed/public-dns/docs/dns-over-https).
+ * Cloudfare also offers a similar service: https://developers.cloudflare.com/1.1.1.1/dns-over-https/json-format/
+ *
+ * @param name Hostname to lookup
+ * @param callback Callback which excepts one parameter response, which is called on receiving DNS response
+ */
+export function dnsQuery(name, callback) {
+  fetch(`https://dns.google.com/resolve?name=${name}`, {
+    accept: 'application/json, text/plain',
+    cache: 'no-cache',
+    method : 'GET'
+  })
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (response) {
+    callback(response);
+  });
+}
