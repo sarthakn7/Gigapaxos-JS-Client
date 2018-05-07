@@ -12,3 +12,12 @@ This is a Javascript client for [Gigapaxos](https://github.com/MobilityFirst/gig
 # Usage
 
 Include the generated file gpClient.js via script tag. Client functions can then be accessed using the global variable gpClient.
+
+# Running Example
+
+Start Python server in base directory:
+
+`python3 -m http.server 13080`
+
+Open in browser:
+`http://0.0.0.0:13080/usage_example/example.html`
