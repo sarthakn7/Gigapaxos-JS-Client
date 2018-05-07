@@ -1,5 +1,5 @@
 {
-  "name": "GigapaxosJsClient",
+  "name": "gigapaxos-client",
   "version": "0.1.0",
   "description": "This is a Javascript client for [Gigapaxos](https://github.com/MobilityFirst/gigapaxos \"Gigapaxos\").",
   "main": "dist/gpClient.js",
