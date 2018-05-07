@@ -43,7 +43,7 @@ Last updated: <label id="last_updated">NA</label> <br>
     let value = document.getElementById('input').value;
     let time = (new Date()).toLocaleString();
     // Client used by calling function from gpClient object
-    gpClient.sendAppRequest('LinWritesLocReadsApp0', 401, {REQUEST_VALUE : value}, function (response) {
+    gpClient.sendAppRequest('LinWritesLocReadsApp0', 401, {REQUEST_VALUE : value, STOP : false, EPOCH : 0}, function (response) {
       console.log('Received response : ' + response);
       setValueFromResponse(response);
       addResponseToTable(time, value, response);
@@ -51,15 +51,7 @@ Last updated: <label id="last_updated">NA</label> <br>
   }
 
   function getCurrentValue() {
-    gpClient.sendAppRequest('LinWritesLocReadsApp0', 402, {REQUEST_VALUE : 0}, function (response) {
-      console.log('Received response : ' + response);
-      document.getElementById('value').innerHTML = response['REQUEST_VALUE'].substring(6);
-      document.getElementById('last_updated').innerHTML = (new Date()).toLocaleString();
-    });
-  }
-
-  function getActiveReplicas() {
-    requestActiveReplicas('**', function (response) {
+    gpClient.sendAppRequest('LinWritesLocReadsApp0', 402, {REQUEST_VALUE : 0, STOP : false, EPOCH : 0}, function (response) {
       console.log('Received response : ' + response);
       document.getElementById('value').innerHTML = response['REQUEST_VALUE'].substring(6);
       document.getElementById('last_updated').innerHTML = (new Date()).toLocaleString();

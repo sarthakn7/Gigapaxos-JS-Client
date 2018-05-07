@@ -16,7 +16,7 @@ const HTTP_PORT_OFFSET = 300; // TODO: replace with mechanism to obtain this
 let broadcastName = '**'; // TODO: comes from config
 let reconfiguratorAddress = 'http://127.0.0.1:9300'; // TODO : fill some valid value here
 // TODO: later: two different initialize, one sets reconfigurator address, one kind of looks up reconfigurator addresses in a dns-like way
-let activesInfo = null;
+let activesInfo = null; // TODO: map from service name to actives
 
 let updatingActiveReplicas = false;
 let pendingAppRequests = [];
@@ -50,7 +50,7 @@ function createActiveReplicaAddress(receivedAddress) {
 }
 
 function sendRequest(request, address, callback) {
-  return fetch(address, {
+  fetch(address, {
     body: JSON.stringify(request), // must match 'Content-Type' header
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
     // credentials: 'same-origin', // include, same-origin, *omit
@@ -137,8 +137,6 @@ export function sendAppRequest(serviceName, type, content, callback) {
     REQUEST_ID : createId(),
     SERVICE_NAME : serviceName,
     type : type,
-    STOP : false,
-    EPOCH : 0
   };
 
   for (let key in content) {
