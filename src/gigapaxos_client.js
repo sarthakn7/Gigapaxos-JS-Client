@@ -121,12 +121,17 @@ function requestActiveReplicas(name, callback) {
   sendRequest(request, reconfiguratorAddress, callback);
 }
 
-function changeActives() {
+const EXECUTE_TYPE = 2000;
 
+export function sendDispersibleRequest(service, request, callback) {
+  sendAppRequest(service, EXECUTE_TYPE, {APP_REQUEST: request}, createCallback(callback));
 }
 
-function changeReconfigurators() {
-
+function createCallback(appCallback) {
+  return function (response) {
+    let appResponse = JSON.parse(response["APP_RESPONSE"]);
+    appCallback(appResponse)
+  }
 }
 
 // App request
@@ -199,32 +204,8 @@ function queueRequest(request, callback) {
 }
 
 function queriedActivesRecently() {
-  // TODO: addiditonal condition which wasn't understood
+  // TODO: additional condition which wasn't understood
   return activesInfo !== null && activesInfo.lastUpdated !== null
       && (Date.now() - activesInfo.lastUpdated < MIN_REQUEST_ACTIVES_INTERVAL);
 
 }
-
-function checkConnectivity() {
-
-}
-
-function checkConnectivityWithAttempts(attemptTimeout, numAttempts, address) {
-  let attempts = 0;
-  while (attempts++ < numAttempts) {
-    if (checkConnectivityWithTimeout(attemptTimeout, address)) {
-      return true;
-    } else {
-      let msg = attempts === 1 ? `Retrying connectivity check to ${address}...` : '';
-      log.info(msg + attempts);
-      checkConnectivityWithTimeout(attemptTimeout, address);
-    }
-  }
-  return false;
-}
-
-function checkConnectivityWithTimeout(attemptTimeout, address) {
-  requestActiveReplicas(broadcastName, null); // TODO: callback that handles connectivity check
-}
-
-// Code that needs to run on initialization

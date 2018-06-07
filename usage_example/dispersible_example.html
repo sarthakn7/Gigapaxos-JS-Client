@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gigapaxos</title>
+
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+  </style>
+
+  <!-- Gigapaxos Client imported here-->
+  <script type="text/javascript" src="https://unpkg.com/gigapaxos-client"></script>
+</head>
+<body>
+
+<p>
+  Current value : <label id="value">NA</label> <br>
+  Last updated: <label id="last_updated">NA</label> <br>
+</p>
+
+<button id="get_current_value">Get current value</button>
+
+<p>
+<div>
+  <label for="input">Add: </label><input id="input" type="number" value="0">
+  <input type="submit" id='submit' value="Submit">
+</div>
+</p>
+
+<table id="output">
+  <tr>
+    <th>Request Time</th>
+    <th>Request Value</th>
+    <th>Response</th>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  dispClient.initialize('http://127.0.0.1:9300');
+
+  function submit() {
+    let value = document.getElementById('input').value;
+    let time = (new Date()).toLocaleString();
+    // Client used by calling function from gpClient object
+    dispClient.sendDispersibleRequest('LinWritesLocReads', {SERVICE_NAME: 'LinWritesLocReads', REQUEST_ID: 0, REQUEST_VALUE : value, STOP : false, EPOCH : 0, type: 401}, function (response) {
+      console.log('Received response : ' + JSON.stringify(response));
+      setValueFromResponse(response);
+      addResponseToTable(time, value, response);
+    });
+  }
+
+  function getCurrentValue() {
+    dispClient.sendDispersibleRequest('LinWritesLocReads', {SERVICE_NAME: 'LinWritesLocReads', REQUEST_ID: 0, REQUEST_VALUE : 0, STOP : false, EPOCH : 0, type: 402}, function (response) {
+      console.log('Received response : ' + JSON.stringify(response));
+      document.getElementById('value').innerHTML = response['REQUEST_VALUE'].substring(6);
+      document.getElementById('last_updated').innerHTML = (new Date()).toLocaleString();
+    });
+  }
+
+  function setValueFromResponse(response) {
+    document.getElementById('value').innerHTML = response['REQUEST_VALUE'].substring(6);
+    document.getElementById('last_updated').innerHTML = (new Date()).toLocaleString();
+  }
+
+  function addResponseToTable(time, requestValue, response) {
+    let table = document.getElementById('output');
+
+    let tr = document.createElement("tr");
+    let tdTime = document.createElement("td");
+    let tdRequestValue = document.createElement("td");
+    let tdResponse = document.createElement("td");
+
+    tdTime.innerHTML = time;
+    tdRequestValue.innerHTML = requestValue;
+    tdResponse.innerHTML = JSON.stringify(response);
+
+    tr.appendChild(tdTime);
+    tr.appendChild(tdRequestValue);
+    tr.appendChild(tdResponse);
+    table.appendChild(tr);
+  }
+
+  let getCurrentValueBtn = document.getElementById("get_current_value");
+  getCurrentValueBtn.addEventListener("click", getCurrentValue, false);
+
+  let submitBtn = document.getElementById("submit");
+  submitBtn.addEventListener("click", submit, false);
+
+</script>
+
+</body>
+</html>
