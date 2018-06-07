@@ -8,6 +8,7 @@ This is a Javascript client for [Gigapaxos](https://github.com/MobilityFirst/gig
 2. Install webpack: npm install webpack -g (or locally in repo)
 3. Run npx webpack or npx webpack --mode development for quicker build without uglification
 4. gpClient.js is generated in dist folder
+5. Update the version in package.json and run npm publish to publish a new version to NPM (NPM authoring settings need to be done separately, [this](https://docs.npmjs.com/getting-started/publishing-npm-packages) is a good resource).
 
 # Usage
 
