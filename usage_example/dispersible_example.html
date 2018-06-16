@@ -39,13 +39,13 @@
 </table>
 
 <script type="text/javascript">
-  dispClient.initialize('http://127.0.0.1:9300');
+  gpClient.initialize('http://127.0.0.1:9300');
 
   function submit() {
     let value = document.getElementById('input').value;
     let time = (new Date()).toLocaleString();
     // Client used by calling function from gpClient object
-    dispClient.sendDispersibleRequest('LinWritesLocReads', {SERVICE_NAME: 'LinWritesLocReads', REQUEST_ID: 0, REQUEST_VALUE : value, STOP : false, EPOCH : 0, type: 401}, function (response) {
+    gpClient.sendDispersibleRequest('LinWritesLocReads', {SERVICE_NAME: 'LinWritesLocReads', REQUEST_ID: 0, REQUEST_VALUE : value, STOP : false, EPOCH : 0, type: 401}, function (response) {
       console.log('Received response : ' + JSON.stringify(response));
       setValueFromResponse(response);
       addResponseToTable(time, value, response);
@@ -53,7 +53,7 @@
   }
 
   function getCurrentValue() {
-    dispClient.sendDispersibleRequest('LinWritesLocReads', {SERVICE_NAME: 'LinWritesLocReads', REQUEST_ID: 0, REQUEST_VALUE : 0, STOP : false, EPOCH : 0, type: 402}, function (response) {
+    gpClient.sendDispersibleRequest('LinWritesLocReads', {SERVICE_NAME: 'LinWritesLocReads', REQUEST_ID: 0, REQUEST_VALUE : 0, STOP : false, EPOCH : 0, type: 402}, function (response) {
       console.log('Received response : ' + JSON.stringify(response));
       document.getElementById('value').innerHTML = response['REQUEST_VALUE'].substring(6);
       document.getElementById('last_updated').innerHTML = (new Date()).toLocaleString();
